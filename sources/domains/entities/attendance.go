@@ -8,10 +8,11 @@ import (
 
 type Attendance struct {
 	Entity[int]
-	location  Location
-	in        objects.SwaproTime
-	out       *objects.SwaproTime
-	changelog objects.Changelog
+	employeeCode objects.InformationNumber[string]
+	location     Location
+	in           objects.SwaproTime
+	out          *objects.SwaproTime
+	changelog    objects.Changelog
 }
 
 type LocationParam struct {
@@ -22,6 +23,7 @@ type LocationParam struct {
 
 func NewAttendance(
 	id int,
+	employeeCode string,
 	locationParam LocationParam,
 	in time.Time,
 	out *time.Time,
@@ -38,6 +40,7 @@ func NewAttendance(
 		Entity[int]{
 			identifier: objects.NewIdentifier(id),
 		},
+		objects.NewInformationNumber(employeeCode),
 		NewLocation(locationParam.ID, locationParam.Name, locationParam.ChangelogParam),
 		objects.NewSwaproTime(in),
 		outTime,
@@ -45,8 +48,8 @@ func NewAttendance(
 	}
 }
 
-func (att Attendance) ID() int {
-	return objects.GetNumberIdentifier(att.identifier)
+func (att Attendance) ID() objects.Identifier[int] {
+	return att.identifier
 }
 
 type ROLocation interface {
@@ -60,6 +63,13 @@ func (att Attendance) Location() ROLocation {
 
 func (att Attendance) In() objects.SwaproTime {
 	return att.in
+}
+
+func (att *Attendance) CheckOut() {
+	now := objects.NewSwaproTimeNow()
+	att.out = &now
+
+	att.changelog = att.changelog.UpdatedNow(objects.GetStringInformationNumber(att.employeeCode))
 }
 
 func (att Attendance) Out() *objects.SwaproTime {

@@ -104,11 +104,11 @@ func NewEmployee(id int, param EmployeeParam) Employee {
 		position:    position,
 		department:  department,
 		superiorID:  superiorID,
-		attendances: convertAttendanceParams(param.Attendances),
+		attendances: convertAttendanceParams(param.Code, param.Attendances),
 	}
 }
 
-func convertAttendanceParams(params []AttendanceParam) []entities.Attendance {
+func convertAttendanceParams(employeeCode string, params []AttendanceParam) []entities.Attendance {
 	attendances := make([]entities.Attendance, len(params))
 
 	if len(params) <= 0 {
@@ -118,6 +118,7 @@ func convertAttendanceParams(params []AttendanceParam) []entities.Attendance {
 	for idx, param := range params {
 		attendances[idx] = entities.NewAttendance(
 			param.ID,
+			employeeCode,
 			param.Location,
 			param.AbsentIn,
 			param.AbsentOut,
@@ -418,7 +419,7 @@ func (emp Employee) Info() (EmployeeInfo, error) {
 }
 
 type ROAttendance interface {
-	ID() int
+	ID() objects.Identifier[int]
 	Location() entities.ROLocation
 	In() objects.SwaproTime
 	Out() *objects.SwaproTime
@@ -432,4 +433,67 @@ func (emp Employee) LastCheckInInfo() ROAttendance {
 	}
 
 	return emp.attendances[attLength-1]
+}
+
+func (emp *Employee) CheckOut() error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	lastAttendance := emp.LastCheckInInfo()
+
+	if lastAttendance == nil {
+		return domainErr.NoAvailableCheckIn{}
+	}
+
+	if lastAttendance.Out() != nil {
+		return domainErr.NoAvailableCheckIn{}
+	}
+
+	attLength := len(emp.attendances)
+	emp.attendances[attLength-1].CheckOut()
+
+	emp.addEvent(events.CheckOut{
+		AttendanceID: lastAttendance.ID(),
+		Changelog:    lastAttendance.Changelog().UpdatedNow(emp.root.Code()),
+	})
+
+	return nil
+}
+
+func (emp *Employee) CheckIn(loc entities.LocationParam) error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	lastAttendance := emp.LastCheckInInfo()
+
+	if lastAttendance != nil {
+		if lastAttendance.Out() == nil {
+			return domainErr.AttendanceStillActive{}
+		}
+	}
+
+	now := time.Now()
+	emp.attendances = append(
+		emp.attendances,
+		entities.NewAttendance(
+			0, emp.root.Code(),
+			entities.LocationParam{Name: loc.Name},
+			now, nil,
+			objects.ChangelogParam{
+				CreatedAt: now,
+				CreatedBy: emp.root.Code(),
+			},
+		),
+	)
+
+	emp.addEvent(events.CheckIn{
+		EmployeeID: emp.root.ID(),
+		Name:       loc.Name,
+		In:         objects.NewSwaproTime(now),
+		Changelog:  lastAttendance.Changelog().UpdatedNow(emp.root.Code()),
+	})
+
+	return nil
 }

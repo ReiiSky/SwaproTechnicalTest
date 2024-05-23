@@ -241,3 +241,38 @@ func TestEmployeeCheckIn(t *testing.T) {
 		t.Error("Employee check in info is null, expected to be exist")
 	}
 }
+
+func TestEmployeeCheckOutThenCheckIn(t *testing.T) {
+	if err := firstEmployee.CheckOut(); err != nil {
+		t.Errorf("Checkout error is not a nill with message: %s", err.Error())
+	}
+
+	checkInLocationParam := entities.LocationParam{Name: "Building B"}
+	if err := firstEmployee.CheckIn(checkInLocationParam); err != nil {
+		t.Errorf("Checkin error is not a nill with message: %s", err.Error())
+	}
+
+	info := firstEmployee.LastCheckInInfo()
+
+	if info == nil {
+		t.Error("Employee check in info is null, expected to be exist")
+	}
+
+	if info.Location().Name() != checkInLocationParam.Name {
+		t.Errorf("Expected checkin location is %s but get %s", checkInLocationParam.Name, info.Location().Name())
+	}
+
+	empEvents := firstEmployee.Events()
+
+	if len(empEvents) != 2 {
+		t.Error("Employee aggregate supposed to have two event")
+	}
+
+	if _, ok := empEvents[0].Top().(events.CheckOut); !ok {
+		t.Error("Event inside employee check out is not CheckOut")
+	}
+
+	if _, ok := empEvents[1].Top().(events.CheckIn); !ok {
+		t.Error("Event inside employee checkin is not CheckIn")
+	}
+}
