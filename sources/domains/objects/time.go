@@ -3,8 +3,7 @@ package objects
 import "time"
 
 type SwaproTime struct {
-	t        time.Time
-	platform time.Time
+	t time.Time
 }
 
 func NewSwaproTime(t time.Time) SwaproTime {
@@ -13,17 +12,6 @@ func NewSwaproTime(t time.Time) SwaproTime {
 	}
 }
 
-func (swaproTime SwaproTime) ToISO() string {
-	return swaproTime.t.Format(time.RFC3339)
-}
-
-func (swaproTime SwaproTime) PlatformToISO() string {
-	return swaproTime.platform.Format(time.RFC3339)
-}
-
-func (swaproTime SwaproTime) SetPlatformTime(platform time.Time) SwaproTime {
-	return SwaproTime{
-		swaproTime.t,
-		platform,
-	}
+func (swaproTime SwaproTime) ToISOUTC() string {
+	return swaproTime.t.UTC().Format(time.RFC3339)
 }

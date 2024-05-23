@@ -29,3 +29,15 @@ func NewDepartment(
 func (d Department) NameEqual(name string) bool {
 	return strings.Compare(d.name, name) == 0
 }
+
+func (d Department) ID() objects.Identifier[int] {
+	return d.identifier
+}
+
+func (d Department) Name() string {
+	return d.name
+}
+
+func (d Department) Changelog() objects.Changelog {
+	return d.changelog
+}

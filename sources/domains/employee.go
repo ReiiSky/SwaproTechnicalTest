@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/entities"
+	domainErr "github.com/ReiiSky/SwaproTechnical/sources/domains/errors"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/events"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
 )
@@ -136,4 +137,62 @@ func (employee *Employee) Register() {
 		Department: employee.department,
 		SuperiorID: employee.superiorID,
 	})
+}
+
+type ReadOnlyDepartment interface {
+	ID() objects.Identifier[int]
+	Name() string
+	Changelog() objects.Changelog
+}
+
+type Superior interface {
+	ID() objects.Identifier[int]
+	Department() ReadOnlyDepartment
+}
+
+func (employee *Employee) AssignSuperior(super Superior, newPositionParam PositionParam) error {
+	if super.Department() == nil {
+		return domainErr.DepartmentNotExist{}
+	}
+
+	// this employee will work under the same department as superior.
+	superID := super.ID()
+	employee.superiorID = &superID
+
+	employee.addEvent(events.UpdateSuperior{
+		EmployeeID: employee.root.ID(),
+		SuperiorID: superID,
+	})
+
+	newPosition := entities.NewPosition(
+		// id in param, could be 0, if it's,
+		// then create position in this department.
+		newPositionParam.ID,
+		objects.GetNumberIdentifier(super.Department().ID()),
+		newPositionParam.Name,
+		newPositionParam.ChangelogParam,
+	)
+
+	employee.position = &newPosition
+	// attach superior department to subordinate.
+	superDep := entities.NewDepartment(
+		objects.GetNumberIdentifier(super.Department().ID()),
+		super.Department().Name(),
+		objects.ChangelogParam{}, // TODO: Not needed yet.
+	)
+	employee.department = &superDep
+	employee.addEvent(events.CreateOrUsePosition{
+		DepartmentID: super.Department().ID(),
+		PositionName: newPositionParam.Name,
+	})
+
+	return nil
+}
+
+func (emp Employee) ID() objects.Identifier[int] {
+	return emp.root.ID()
+}
+
+func (emp Employee) Department() ReadOnlyDepartment {
+	return emp.department
 }

@@ -13,31 +13,46 @@ type ChangelogParam struct {
 }
 
 type updateLog struct {
-	at time.Time
+	at SwaproTime
 	by string
 }
 
 type Changelog struct {
-	createdAt time.Time
+	createdAt SwaproTime
 	createdBy string
 	update    *updateLog
-	deletedAt *time.Time
+	deletedAt *SwaproTime
 }
 
 func NewChangelog(param ChangelogParam) Changelog {
 	var update *updateLog
+	var deletedAt *SwaproTime
 
 	if param.Update != nil {
 		update = &updateLog{
-			at: param.Update.At,
+			at: NewSwaproTime(param.Update.At),
 			by: param.Update.By,
 		}
 	}
 
+	if param.DeletedAt != nil {
+		d := NewSwaproTime(*param.DeletedAt)
+		deletedAt = &d
+	}
+
 	return Changelog{
-		createdAt: param.CreatedAt,
+		createdAt: NewSwaproTime(param.CreatedAt),
 		createdBy: param.CreatedBy,
 		update:    update,
-		deletedAt: param.DeletedAt,
+		deletedAt: deletedAt,
+	}
+}
+
+func NewCreateChangelog(createdByEmployeeCode string) Changelog {
+	now := time.Now()
+
+	return Changelog{
+		createdAt: NewSwaproTime(now),
+		createdBy: createdByEmployeeCode,
 	}
 }

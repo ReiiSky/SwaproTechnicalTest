@@ -110,3 +110,69 @@ func TestRegisterUser(t *testing.T) {
 		}
 	}
 }
+
+func TestAssignSupervisor(t *testing.T) {
+	employeeIDs := []int{7, 9}
+	employeeCode := []string{"22010007", "22010009"}
+
+	employeeParams := make([]domains.EmployeeParam, 2)
+	employeeParams[0] = domains.EmployeeParam{
+		Code:     employeeCode[0],
+		Name:     "employee seven",
+		Password: "7eafc9a76b469dcbd0a6b3b4b79870da",
+		Position: &domains.PositionParam{
+			ID:   2,
+			Name: "Tech Lead",
+			Department: domains.DepartmentParam{
+				ID:   2,
+				Name: "IT",
+			},
+			ChangelogParam: newChangelogParam(employeeCode[0], false, false),
+		},
+		ChangelogParam: newChangelogParam(employeeCode[0], false, false),
+	}
+
+	employeeParams[1] = domains.EmployeeParam{
+		Code:     employeeCode[1],
+		Name:     "employee nine",
+		Password: "500e869096404a205a2b186a36fe0867",
+		// the above employee wil be a supervisor of this employee.
+		ChangelogParam: newChangelogParam(employeeCode[0], false, false),
+	}
+
+	employees := make([]domains.Employee, len(employeeParams))
+
+	for idx, param := range employeeParams {
+		employees[idx] = domains.NewEmployee(employeeIDs[idx], param)
+	}
+
+	superior := employees[0]
+	subordinate := employees[1]
+
+	err := subordinate.AssignSuperior(superior, domains.PositionParam{
+		Name: "Data Scientist",
+		Department: domains.DepartmentParam{
+			Name: "Growth",
+		},
+	})
+
+	if err != nil {
+		t.Error("Assign superior error is not a nill with message: " + err.Error())
+	}
+
+	subEvents := subordinate.Events()
+
+	// events of assign superior is update superior and
+	// update position.
+	if len(subEvents) != 2 {
+		t.Error("Employee aggregate supposed to have two event")
+	}
+
+	if _, ok := subEvents[0].Top().(events.UpdateSuperior); !ok {
+		t.Error("Aggregate inside employee after assign superior is not UpdateSuperior.")
+	}
+
+	if _, ok := subEvents[1].Top().(events.CreateOrUsePosition); !ok {
+		t.Error("Aggregate inside employee after assign superior is not CreateOrUsePosition.")
+	}
+}
