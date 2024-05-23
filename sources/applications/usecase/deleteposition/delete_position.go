@@ -1,4 +1,4 @@
-package deleteemployee
+package deleteposition
 
 import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications"
