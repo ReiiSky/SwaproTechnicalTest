@@ -70,3 +70,15 @@ func (c Changelog) DeletedNow() Changelog {
 
 	return c
 }
+
+func (c Changelog) CreatedAt() SwaproTime {
+	return c.createdAt
+}
+
+func (c Changelog) UpdatedAt() *SwaproTime {
+	if c.update == nil {
+		return nil
+	}
+
+	return &c.update.at
+}

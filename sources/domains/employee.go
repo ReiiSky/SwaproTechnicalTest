@@ -24,6 +24,7 @@ type PositionParam struct {
 	Name       string
 	Department DepartmentParam
 	objects.ChangelogParam
+	EmployeeCount int
 }
 
 type AttendanceParam struct {
@@ -77,6 +78,7 @@ func NewEmployee(id int, param EmployeeParam) Employee {
 			param.Position.Department.ID,
 			param.Position.Name,
 			param.Position.ChangelogParam,
+			param.Position.EmployeeCount,
 		)
 
 		position = &p
@@ -142,12 +144,6 @@ func (employee *Employee) Register() {
 	})
 }
 
-type ROPosition interface {
-	ID() objects.Identifier[int]
-	Name() string
-	Changelog() objects.Changelog
-}
-
 type RODepartment interface {
 	ID() objects.Identifier[int]
 	Name() string
@@ -180,6 +176,7 @@ func (employee *Employee) AssignSuperior(super Superior, newPositionParam Positi
 		objects.GetNumberIdentifier(super.Department().ID()),
 		newPositionParam.Name,
 		newPositionParam.ChangelogParam,
+		newPositionParam.EmployeeCount,
 	)
 
 	employee.position = &newPosition
@@ -205,6 +202,13 @@ func (emp Employee) ID() objects.Identifier[int] {
 
 func (emp Employee) Department() RODepartment {
 	return emp.department
+}
+
+type ROPosition interface {
+	ID() objects.Identifier[int]
+	Name() string
+	Info() entities.PositionInfo
+	Changelog() objects.Changelog
 }
 
 func (emp Employee) Position() ROPosition {
@@ -254,7 +258,7 @@ func (emp *Employee) ApplyPosition(posParam PositionParam, depParam DepartmentPa
 		return domainErr.PositionOrDepartmentNotExist{}
 	}
 
-	newPos := entities.NewPosition(0, 0, posParam.Name, posParam.ChangelogParam)
+	newPos := entities.NewPosition(0, 0, posParam.Name, posParam.ChangelogParam, posParam.EmployeeCount)
 	emp.position = &newPos
 
 	newDep := entities.NewDepartment(0, depParam.Name, depParam.ChangelogParam)

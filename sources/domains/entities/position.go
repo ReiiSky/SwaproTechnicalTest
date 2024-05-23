@@ -1,12 +1,15 @@
 package entities
 
-import "github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
+import (
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
+)
 
 type Position struct {
 	Entity[int]
-	departmentID objects.Identifier[int]
-	name         string
-	changelog    objects.Changelog
+	departmentID  objects.Identifier[int]
+	name          string
+	changelog     objects.Changelog
+	employeeCount int
 }
 
 func NewPosition(
@@ -14,6 +17,7 @@ func NewPosition(
 	departmentID int,
 	name string,
 	changelog objects.ChangelogParam,
+	employeeCount int,
 ) Position {
 	return Position{
 		Entity[int]{
@@ -22,6 +26,7 @@ func NewPosition(
 		objects.NewIdentifier(departmentID),
 		name,
 		objects.NewChangelog(changelog),
+		employeeCount,
 	}
 }
 
@@ -39,4 +44,22 @@ func (p Position) Changelog() objects.Changelog {
 
 func (p *Position) ChangeName(name string) {
 	p.name = name
+}
+
+type PositionInfo struct {
+	ID            int
+	Name          string
+	EmployeeCount int
+	CreatedAt     objects.SwaproTime
+	UpdatedAt     *objects.SwaproTime
+}
+
+func (p Position) Info() PositionInfo {
+	return PositionInfo{
+		objects.GetNumberIdentifier(p.identifier),
+		p.name,
+		p.employeeCount,
+		p.changelog.CreatedAt(),
+		p.changelog.UpdatedAt(),
+	}
 }
