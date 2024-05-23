@@ -54,6 +54,7 @@ type Employee struct {
 
 	// internal state
 	isRegistered bool
+	isDeleted    bool
 }
 
 func NewEmployee(id int, param EmployeeParam) Employee {
@@ -119,6 +120,8 @@ func (employee Employee) WorkInDepartment(name string) bool {
 	return employee.department.NameEqual(name)
 }
 
+// IsRegisterable returned true if id is none,
+// which is employee is not exist in database.
 func (employee Employee) IsRegisterable() bool {
 	return (objects.GetNumberIdentifier(employee.root.ID()) <= 0 ||
 		len(employee.root.Code()) <= len(formatPrefixEmployeeCode)) &&
@@ -195,4 +198,22 @@ func (emp Employee) ID() objects.Identifier[int] {
 
 func (emp Employee) Department() ReadOnlyDepartment {
 	return emp.department
+}
+
+func (emp *Employee) Delete() error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if emp.isDeleted {
+		return domainErr.EmployeeIsDeleted{}
+	}
+
+	emp.addEvent(events.DeleteEmployee{
+		ID:        emp.ID(),
+		Changelog: emp.root.Changelog().UpdatedNow(emp.root.Code()).DeletedNow(),
+	})
+
+	emp.isDeleted = true
+	return nil
 }

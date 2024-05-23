@@ -12,6 +12,12 @@ func NewSwaproTime(t time.Time) SwaproTime {
 	}
 }
 
+func NewSwaproTimeNow() SwaproTime {
+	return SwaproTime{
+		t: time.Now(),
+	}
+}
+
 func (swaproTime SwaproTime) ToISOUTC() string {
 	return swaproTime.t.UTC().Format(time.RFC3339)
 }

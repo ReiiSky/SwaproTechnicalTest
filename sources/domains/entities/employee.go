@@ -31,3 +31,7 @@ func NewEmployee(
 func (employee Employee) Code() string {
 	return objects.GetStringInformationNumber(employee.code)
 }
+
+func (emp Employee) Changelog() objects.Changelog {
+	return emp.changelog
+}

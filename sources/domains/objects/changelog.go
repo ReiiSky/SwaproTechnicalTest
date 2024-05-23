@@ -49,10 +49,24 @@ func NewChangelog(param ChangelogParam) Changelog {
 }
 
 func NewCreateChangelog(createdByEmployeeCode string) Changelog {
-	now := time.Now()
-
 	return Changelog{
-		createdAt: NewSwaproTime(now),
+		createdAt: NewSwaproTimeNow(),
 		createdBy: createdByEmployeeCode,
 	}
+}
+
+func (c Changelog) UpdatedNow(updatedByEmployeeCode string) Changelog {
+	c.update = &updateLog{
+		at: NewSwaproTimeNow(),
+		by: updatedByEmployeeCode,
+	}
+
+	return c
+}
+
+func (c Changelog) DeletedNow() Changelog {
+	t := NewSwaproTimeNow()
+	c.deletedAt = &t
+
+	return c
 }
