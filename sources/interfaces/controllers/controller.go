@@ -6,14 +6,16 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/assignsupervisor"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deleteemployee"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getemployeeinfo"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getpositioninformation"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/register"
 )
 
 type Controller struct {
-	registerUsecase        register.Usecase
-	getemployeeInfoUsecase getemployeeinfo.Usecase
-	deleteemployeeUsecase  deleteemployee.Usecase
-	assignsuperior         assignsupervisor.Usecase
+	registerUsecase               register.Usecase
+	getemployeeInfoUsecase        getemployeeinfo.Usecase
+	deleteemployeeUsecase         deleteemployee.Usecase
+	assignsuperior                assignsupervisor.Usecase
+	getpositioninformationUsecase getpositioninformation.Usecase
 }
 
 func NewController() Controller {
@@ -22,6 +24,7 @@ func NewController() Controller {
 		getemployeeinfo.Usecase{},
 		deleteemployee.Usecase{},
 		assignsupervisor.Usecase{},
+		getpositioninformation.Usecase{},
 	}
 }
 
@@ -148,4 +151,33 @@ func (c Controller) AssignSuperior(
 	}
 
 	return nil
+}
+
+func (c Controller) GetPositionInformation(
+	process applications.Process,
+	payload ControllerPayload,
+) (getpositioninformation.PositionInformationOutput, *usecase.ErrorWithCode) {
+	if payload.Authtoken == nil {
+		return getpositioninformation.PositionInformationOutput{}, &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return getpositioninformation.PositionInformationOutput{}, &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	output, errCode := c.getpositioninformationUsecase.Execute(process, authPayload)
+
+	if errCode != nil {
+		return getpositioninformation.PositionInformationOutput{}, errCode
+	}
+
+	return output, nil
 }

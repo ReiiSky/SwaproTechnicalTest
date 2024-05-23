@@ -121,3 +121,17 @@ func (f *Fiber) AssignSuperior(ctx fiber.Ctx) error {
 
 	return f.ok(ctx, nil)
 }
+
+func (f *Fiber) GetPositionInformation(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	output, errCode := f.controller.GetPositionInformation(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, output)
+}
