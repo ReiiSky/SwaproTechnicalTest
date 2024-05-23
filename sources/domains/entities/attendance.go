@@ -62,6 +62,10 @@ func (att *Attendance) ChangeLocationName(newName string) {
 	att.location.ChangeName(att.employeeCode, newName)
 }
 
+func (att *Attendance) DeleteLocation() {
+	att.location.Delete(att.employeeCode)
+}
+
 func (att Attendance) Location() ROLocation {
 	return att.location
 }

@@ -545,3 +545,31 @@ func (emp *Employee) ChangeLocationNameByAttendance(
 
 	return domainErr.AttendanceNotFound{}
 }
+
+func (emp *Employee) DeleteLocationByAttendance(
+	attendance ROAttendance,
+) error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if len(emp.attendances) <= 0 {
+		return domainErr.AttendanceNotFound{}
+	}
+
+	for _, att := range emp.attendances {
+		if !att.ID().Equal(attendance.ID()) {
+			continue
+		}
+
+		att.DeleteLocation()
+		emp.addEvent(events.DeleteLocation{
+			ID:        att.Location().ID(),
+			Changelog: att.Location().Changelog(),
+		})
+
+		return nil
+	}
+
+	return domainErr.AttendanceNotFound{}
+}

@@ -6,6 +6,9 @@ type Location struct {
 	Entity[int]
 	name      string
 	changelog objects.Changelog
+
+	// internal state
+	isDeleted bool
 }
 
 func NewLocation(
@@ -19,6 +22,7 @@ func NewLocation(
 		},
 		name,
 		objects.NewChangelog(changelog),
+		false,
 	}
 }
 
@@ -30,6 +34,17 @@ func (loc *Location) ChangeName(employeeCode objects.InformationNumber[string], 
 	loc.name = newName
 	loc.changelog = loc.changelog.
 		UpdatedNow(objects.GetStringInformationNumber(employeeCode))
+}
+
+func (loc *Location) Delete(employeeCode objects.InformationNumber[string]) {
+	if loc.isDeleted {
+		return
+	}
+
+	loc.isDeleted = true
+	loc.changelog = loc.changelog.
+		UpdatedNow(objects.GetStringInformationNumber(employeeCode)).
+		DeletedNow()
 }
 
 func (loc Location) Name() string {
