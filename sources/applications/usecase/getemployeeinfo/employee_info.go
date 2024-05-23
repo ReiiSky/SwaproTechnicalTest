@@ -17,7 +17,7 @@ var errMaps = usecase.NewErrorMapper().
 func (u Usecase) Execute(
 	process applications.Process,
 	authPayload auth.AuthPayload,
-) (EmployeeRegisterOutput, *usecase.ErrorWithCode) {
+) (EmployeeInfoOutput, *usecase.ErrorWithCode) {
 	repositories := process.Repositories()
 	aggr := repositories.Employee().
 		GetOne(specifications.GetByID{ID: authPayload.EmployeeID})
@@ -25,16 +25,16 @@ func (u Usecase) Execute(
 	employee, ok := aggr.(*domains.Employee)
 
 	if !ok {
-		return EmployeeRegisterOutput{}, errMaps.Map(domainErr.EmployeeNotExist{})
+		return EmployeeInfoOutput{}, errMaps.Map(domainErr.EmployeeNotExist{})
 	}
 
 	info, err := employee.Info()
 
 	if err != nil {
-		return EmployeeRegisterOutput{}, errMaps.Map(err)
+		return EmployeeInfoOutput{}, errMaps.Map(err)
 	}
 
-	return EmployeeRegisterOutput{
+	return EmployeeInfoOutput{
 		Name:       info.Name,
 		Position:   info.PositionName,
 		Department: info.DepartementName,

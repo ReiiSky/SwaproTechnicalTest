@@ -54,9 +54,9 @@ func (c Controller) RegisterEmployee(
 func (c Controller) GetEmployeeInfo(
 	process applications.Process,
 	payload ControllerPayload,
-) (getemployeeinfo.EmployeeRegisterOutput, *usecase.ErrorWithCode) {
+) (getemployeeinfo.EmployeeInfoOutput, *usecase.ErrorWithCode) {
 	if payload.Authtoken == nil {
-		return getemployeeinfo.EmployeeRegisterOutput{}, &usecase.ErrorWithCode{
+		return getemployeeinfo.EmployeeInfoOutput{}, &usecase.ErrorWithCode{
 			ErrCode: usecase.ErrCodeUnauthorized,
 		}
 	}
@@ -65,7 +65,7 @@ func (c Controller) GetEmployeeInfo(
 		Auth().Decode(*payload.Authtoken)
 
 	if err != nil {
-		return getemployeeinfo.EmployeeRegisterOutput{}, &usecase.ErrorWithCode{
+		return getemployeeinfo.EmployeeInfoOutput{}, &usecase.ErrorWithCode{
 			ErrCode:     usecase.ErrCodeUnauthorized,
 			ErrInstance: err,
 		}
@@ -74,7 +74,7 @@ func (c Controller) GetEmployeeInfo(
 	output, errCode := c.getemployeeInfoUsecase.Execute(process, authPayload)
 
 	if errCode != nil {
-		return getemployeeinfo.EmployeeRegisterOutput{}, errCode
+		return getemployeeinfo.EmployeeInfoOutput{}, errCode
 	}
 
 	return output, nil
