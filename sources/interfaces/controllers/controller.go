@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/applytoposition"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/assignsupervisor"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deleteemployee"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getemployeeinfo"
@@ -16,6 +17,7 @@ type Controller struct {
 	deleteemployeeUsecase         deleteemployee.Usecase
 	assignsuperior                assignsupervisor.Usecase
 	getpositioninformationUsecase getpositioninformation.Usecase
+	applytopositionUsecase        applytoposition.Usecase
 }
 
 func NewController() Controller {
@@ -25,6 +27,7 @@ func NewController() Controller {
 		deleteemployee.Usecase{},
 		assignsupervisor.Usecase{},
 		getpositioninformation.Usecase{},
+		applytoposition.Usecase{},
 	}
 }
 
@@ -180,4 +183,42 @@ func (c Controller) GetPositionInformation(
 	}
 
 	return output, nil
+}
+
+func (c Controller) ApplyPosition(
+	process applications.Process,
+	payload ControllerPayload,
+) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := applytoposition.NewApplyToPositionInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	errCode := c.applytopositionUsecase.Execute(process, authPayload, input)
+
+	if errCode != nil {
+		return errCode
+	}
+
+	return nil
 }
