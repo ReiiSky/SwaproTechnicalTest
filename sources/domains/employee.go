@@ -497,3 +497,16 @@ func (emp *Employee) CheckIn(loc entities.LocationParam) error {
 
 	return nil
 }
+
+func (emp *Employee) DeleteAttendances() error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	emp.addEvent(events.DeleteAttendances{
+		EmployeeID: emp.ID(),
+	})
+
+	emp.attendances = make([]entities.Attendance, 0)
+	return nil
+}
