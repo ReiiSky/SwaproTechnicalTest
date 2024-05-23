@@ -36,3 +36,7 @@ func (p Position) Name() string {
 func (p Position) Changelog() objects.Changelog {
 	return p.changelog
 }
+
+func (p *Position) ChangeName(name string) {
+	p.name = name
+}

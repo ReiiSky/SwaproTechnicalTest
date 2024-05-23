@@ -268,3 +268,26 @@ func (emp *Employee) ApplyPosition(posParam PositionParam, depParam DepartmentPa
 
 	return nil
 }
+
+func (emp *Employee) ChangePositionName(name string) error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if !emp.InEmployement() {
+		return domainErr.NotAnEmployee{}
+	}
+
+	if len(name) <= 0 {
+		return domainErr.PositionOrDepartmentNotExist{}
+	}
+
+	emp.position.ChangeName(name)
+	emp.addEvent(events.UpdatePosition{
+		ID:        emp.position.ID(),
+		NewName:   name,
+		Changelog: emp.position.Changelog().UpdatedNow(emp.root.Code()),
+	})
+
+	return nil
+}
