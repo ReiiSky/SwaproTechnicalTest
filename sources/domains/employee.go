@@ -359,9 +359,9 @@ func (emp *Employee) ChangeDepartementName(name string) error {
 
 	emp.department.ChangeName(name)
 	emp.addEvent(events.UpdateDepartment{
-		ID:        emp.position.ID(),
+		ID:        emp.department.ID(),
 		NewName:   name,
-		Changelog: emp.position.Changelog().UpdatedNow(emp.root.Code()),
+		Changelog: emp.department.Changelog().UpdatedNow(emp.root.Code()),
 	})
 
 	return nil
