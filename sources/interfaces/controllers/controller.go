@@ -5,8 +5,19 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/applytoposition"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/assignsupervisor"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/changedepartmentname"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/changelocationname"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/changepositionname"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/checkin"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/checkout"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deleteattendance"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deletedepartment"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deleteemployee"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deletelocation"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deleteposition"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getdepartmentinformation"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getemployeeinfo"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getlocationattendances"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getpositioninformation"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/register"
 )
@@ -18,6 +29,17 @@ type Controller struct {
 	assignsuperior                assignsupervisor.Usecase
 	getpositioninformationUsecase getpositioninformation.Usecase
 	applytopositionUsecase        applytoposition.Usecase
+	changepositionUsecase         changepositionname.Usecase
+	deletepositionUsecase         deleteposition.Usecase
+	getdepartmentinformation      getdepartmentinformation.Usecase
+	changedepartmentname          changedepartmentname.Usecase
+	deletedepartmentUsecase       deletedepartment.Usecase
+	checkinUsecase                checkin.Usecase
+	checkoutUsecase               checkout.Usecase
+	deleteattendance              deleteattendance.Usecase
+	getlocationattendances        getlocationattendances.Usecase
+	changelocationname            changelocationname.Usecase
+	deletelocationUsecase         deletelocation.Usecase
 }
 
 func NewController() Controller {
@@ -28,6 +50,17 @@ func NewController() Controller {
 		assignsupervisor.Usecase{},
 		getpositioninformation.Usecase{},
 		applytoposition.Usecase{},
+		changepositionname.Usecase{},
+		deleteposition.Usecase{},
+		getdepartmentinformation.Usecase{},
+		changedepartmentname.Usecase{},
+		deletedepartment.Usecase{},
+		checkin.Usecase{},
+		checkout.Usecase{},
+		deleteattendance.Usecase{},
+		getlocationattendances.Usecase{},
+		changelocationname.Usecase{},
+		deletelocation.Usecase{},
 	}
 }
 
@@ -37,10 +70,7 @@ type ControllerPayload struct {
 	BodyString *string
 }
 
-func (c Controller) RegisterEmployee(
-	process applications.Process,
-	payload ControllerPayload,
-) *usecase.ErrorWithCode {
+func (c Controller) RegisterEmployee(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
 	if payload.BodyString == nil {
 		return &usecase.ErrorWithCode{
 			ErrCode:     usecase.ErrCodeInvalidRequest,
@@ -60,10 +90,7 @@ func (c Controller) RegisterEmployee(
 	return c.registerUsecase.Execute(process, input)
 }
 
-func (c Controller) GetEmployeeInfo(
-	process applications.Process,
-	payload ControllerPayload,
-) (getemployeeinfo.EmployeeInfoOutput, *usecase.ErrorWithCode) {
+func (c Controller) GetEmployeeInfo(process applications.Process, payload ControllerPayload) (getemployeeinfo.EmployeeInfoOutput, *usecase.ErrorWithCode) {
 	if payload.Authtoken == nil {
 		return getemployeeinfo.EmployeeInfoOutput{}, &usecase.ErrorWithCode{
 			ErrCode: usecase.ErrCodeUnauthorized,
@@ -89,10 +116,7 @@ func (c Controller) GetEmployeeInfo(
 	return output, nil
 }
 
-func (c Controller) DeleteEmployee(
-	process applications.Process,
-	payload ControllerPayload,
-) *usecase.ErrorWithCode {
+func (c Controller) DeleteEmployee(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
 	if payload.Authtoken == nil {
 		return &usecase.ErrorWithCode{
 			ErrCode: usecase.ErrCodeUnauthorized,
@@ -118,10 +142,7 @@ func (c Controller) DeleteEmployee(
 	return nil
 }
 
-func (c Controller) AssignSuperior(
-	process applications.Process,
-	payload ControllerPayload,
-) *usecase.ErrorWithCode {
+func (c Controller) AssignSuperior(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
 	if payload.Authtoken == nil {
 		return &usecase.ErrorWithCode{
 			ErrCode: usecase.ErrCodeUnauthorized,
@@ -156,10 +177,7 @@ func (c Controller) AssignSuperior(
 	return nil
 }
 
-func (c Controller) GetPositionInformation(
-	process applications.Process,
-	payload ControllerPayload,
-) (getpositioninformation.PositionInformationOutput, *usecase.ErrorWithCode) {
+func (c Controller) GetPositionInformation(process applications.Process, payload ControllerPayload) (getpositioninformation.PositionInformationOutput, *usecase.ErrorWithCode) {
 	if payload.Authtoken == nil {
 		return getpositioninformation.PositionInformationOutput{}, &usecase.ErrorWithCode{
 			ErrCode: usecase.ErrCodeUnauthorized,
@@ -185,10 +203,7 @@ func (c Controller) GetPositionInformation(
 	return output, nil
 }
 
-func (c Controller) ApplyPosition(
-	process applications.Process,
-	payload ControllerPayload,
-) *usecase.ErrorWithCode {
+func (c Controller) ApplyPosition(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
 	if payload.Authtoken == nil {
 		return &usecase.ErrorWithCode{
 			ErrCode: usecase.ErrCodeUnauthorized,
@@ -221,4 +236,271 @@ func (c Controller) ApplyPosition(
 	}
 
 	return nil
+}
+
+func (c Controller) ChangePositionName(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := changepositionname.NewChangePositionInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	errCode := c.changepositionUsecase.Execute(process, authPayload, input)
+	return errCode
+}
+
+func (c Controller) DeletePosition(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	errCode := c.deletepositionUsecase.Execute(process, authPayload)
+	return errCode
+}
+
+func (c Controller) GetDepartmentInformation(process applications.Process, payload ControllerPayload) (getdepartmentinformation.DepartmentInformationOutput, *usecase.ErrorWithCode) {
+	if payload.Authtoken == nil {
+		return getdepartmentinformation.DepartmentInformationOutput{}, &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return getdepartmentinformation.DepartmentInformationOutput{}, &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	return c.getdepartmentinformation.Execute(process, authPayload)
+}
+
+func (c Controller) ChangeDepartmentName(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := changedepartmentname.NewChangeDepartmentInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	return c.changedepartmentname.Execute(process, authPayload, input)
+}
+
+func (c Controller) DeleteDepartment(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	return c.deletedepartmentUsecase.Execute(process, authPayload)
+}
+
+func (c Controller) CheckIn(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := checkin.NewCheckInInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	return c.checkinUsecase.Execute(process, authPayload, input)
+}
+
+func (c Controller) CheckOut(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	return c.checkoutUsecase.Execute(process, authPayload)
+}
+
+func (c Controller) DeleteAttendance(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	return c.deleteattendance.Execute(process, authPayload)
+}
+
+func (c Controller) GetLocationAttendance(process applications.Process, payload ControllerPayload) ([]getlocationattendances.LocationAttendanceOutput, *usecase.ErrorWithCode) {
+	if payload.Authtoken == nil {
+		return []getlocationattendances.LocationAttendanceOutput{}, &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return []getlocationattendances.LocationAttendanceOutput{}, &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	return c.getlocationattendances.Execute(process, authPayload)
+}
+
+func (c Controller) ChangeLocationName(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := changelocationname.NewChangeLocationNameInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	return c.changelocationname.Execute(process, authPayload, input)
+}
+
+func (c Controller) DeleteLocation(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := deletelocation.NewDeleteLocationInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	return c.deletelocationUsecase.Execute(process, authPayload, input)
 }

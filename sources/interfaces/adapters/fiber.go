@@ -149,3 +149,157 @@ func (f *Fiber) ApplyPosition(ctx fiber.Ctx) error {
 
 	return f.ok(ctx, nil)
 }
+
+func (f *Fiber) ChangePositionName(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.ChangePositionName(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) DeletePosition(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.DeletePosition(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) GetDepartmentInformation(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	output, errCode := f.controller.GetDepartmentInformation(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, output)
+}
+
+func (f *Fiber) ChangeDepartmentName(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.ChangeDepartmentName(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) DeleteDepartment(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.DeleteDepartment(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) CheckIn(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.CheckIn(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) CheckOut(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.CheckOut(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) DeleteAttendance(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.DeleteAttendance(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) GetLocationAttendance(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	output, errCode := f.controller.GetLocationAttendance(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, output)
+}
+
+func (f *Fiber) ChangeLocationName(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.ChangeLocationName(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) DeleteLocation(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.DeleteLocation(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
