@@ -4,19 +4,19 @@ const (
 	ScopeEmployee = "employee"
 )
 
-type EventIDDecorator[T IEvent] struct {
+type EventIDDecorator struct {
 	// event ID will be used for retrieve returned value
 	// such as generated id, or returned error.
 	// after event published to command repository.
 	id  int
-	top T
+	top IEvent
 }
 
-func (dec EventIDDecorator[T]) ID() int {
+func (dec EventIDDecorator) ID() int {
 	return dec.id
 }
 
-func (dec EventIDDecorator[T]) Top() T {
+func (dec EventIDDecorator) Top() IEvent {
 	return dec.top
 }
 
@@ -25,29 +25,29 @@ type IEvent interface {
 }
 
 type AggregateContext struct {
-	events         []EventIDDecorator[IEvent]
+	events         []EventIDDecorator
 	currentEventID int
 }
 
 func NewContext() AggregateContext {
 	return AggregateContext{
-		events:         make([]EventIDDecorator[IEvent], 0),
+		events:         make([]EventIDDecorator, 0),
 		currentEventID: 1,
 	}
 }
 
-func (aggr *AggregateContext) addEvent(event IEvent) EventIDDecorator[IEvent] {
+func (aggr *AggregateContext) addEvent(event IEvent) EventIDDecorator {
 	if aggr.events == nil {
-		aggr.events = make([]EventIDDecorator[IEvent], 0)
+		aggr.events = make([]EventIDDecorator, 0)
 	}
 
-	eventWithID := EventIDDecorator[IEvent]{id: aggr.currentEventID, top: event}
+	eventWithID := EventIDDecorator{id: aggr.currentEventID, top: event}
 	aggr.events = append(aggr.events, eventWithID)
 	aggr.currentEventID++
 
 	return eventWithID
 }
 
-func (aggr AggregateContext) Events() []EventIDDecorator[IEvent] {
+func (aggr AggregateContext) Events() []EventIDDecorator {
 	return aggr.events
 }
