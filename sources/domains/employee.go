@@ -192,6 +192,7 @@ func (employee *Employee) AssignSuperior(super Superior, newPositionParam Positi
 	employee.addEvent(events.UpdateSuperior{
 		EmployeeID: employee.root.ID(),
 		SuperiorID: superID,
+		Changelog:  employee.root.Changelog().UpdatedNow(employee.root.Code()),
 	})
 
 	newPosition := entities.NewPosition(
