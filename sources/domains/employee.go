@@ -334,3 +334,23 @@ func (emp *Employee) ChangeDepartementName(name string) error {
 
 	return nil
 }
+
+func (emp *Employee) DeleteDepartment() error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if !emp.InEmployement() {
+		return domainErr.NotAnEmployee{}
+	}
+
+	emp.ApplyPosition(PositionParam{}, DepartmentParam{})
+
+	// TODO: Resign all employee who use this department.
+	emp.addEvent(events.DeleteDepartment{
+		ID:        emp.department.ID(),
+		Changelog: emp.department.Changelog().UpdatedNow(emp.root.Code()),
+	})
+
+	return nil
+}
