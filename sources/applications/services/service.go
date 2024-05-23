@@ -6,3 +6,7 @@ type Auth interface {
 	Decode(string) (auth.AuthPayload, error)
 	Encode(auth.AuthPayload) string
 }
+
+type Hasher interface {
+	Hash(plain string) string
+}

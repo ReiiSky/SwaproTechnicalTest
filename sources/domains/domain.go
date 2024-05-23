@@ -4,6 +4,10 @@ const (
 	ScopeEmployee = "employee"
 )
 
+type ISpecification interface {
+	Specname() string
+}
+
 type EventIDDecorator struct {
 	// event ID will be used for retrieve returned value
 	// such as generated id, or returned error.
