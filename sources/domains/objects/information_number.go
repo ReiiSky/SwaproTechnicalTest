@@ -8,6 +8,6 @@ func NewInformationNumber[T string | int](value T) InformationNumber[T] {
 	return InformationNumber[T]{value}
 }
 
-func (in *InformationNumber[T]) GetNumber() T {
+func GetStringInformationNumber(in InformationNumber[string]) string {
 	return in.value
 }

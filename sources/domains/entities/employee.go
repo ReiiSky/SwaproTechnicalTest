@@ -27,3 +27,7 @@ func NewEmployee(
 		objects.NewChangelog(changelog),
 	}
 }
+
+func (employee Employee) Code() string {
+	return objects.GetStringInformationNumber(employee.code)
+}

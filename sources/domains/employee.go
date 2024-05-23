@@ -4,7 +4,12 @@ import (
 	"time"
 
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/entities"
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/events"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
+)
+
+const (
+	formatPrefixEmployeeCode = "yymm"
 )
 
 type DepartmentParam struct {
@@ -45,6 +50,9 @@ type Employee struct {
 	department  *entities.Department
 	superiorID  *objects.Identifier[int]
 	attendances []entities.Attendance
+
+	// internal state
+	isRegistered bool
 }
 
 func NewEmployee(id int, param EmployeeParam) Employee {
@@ -108,4 +116,24 @@ func (employee Employee) WorkInDepartment(name string) bool {
 	}
 
 	return employee.department.NameEqual(name)
+}
+
+func (employee Employee) IsRegisterable() bool {
+	return (objects.GetNumberIdentifier(employee.root.ID()) <= 0 ||
+		len(employee.root.Code()) <= len(formatPrefixEmployeeCode)) &&
+		!employee.isRegistered
+}
+
+func (employee *Employee) Register() {
+	if !employee.IsRegisterable() {
+		return
+	}
+
+	employee.isRegistered = true
+	employee.addEvent(events.CreateEmployee{
+		Employee:   employee.root,
+		Position:   employee.position,
+		Department: employee.department,
+		SuperiorID: employee.superiorID,
+	})
 }
