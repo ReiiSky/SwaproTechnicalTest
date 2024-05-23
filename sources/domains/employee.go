@@ -599,3 +599,13 @@ func (emp Employee) UniqueAttendanceLocation() []entities.ROLocation {
 
 	return locations
 }
+
+func (emp Employee) GetAttendanceByID(id int) ROAttendance {
+	for _, att := range emp.attendances {
+		if objects.GetNumberIdentifier(att.ID()) == id {
+			return att
+		}
+	}
+
+	return nil
+}
