@@ -79,3 +79,17 @@ func (f *Fiber) RegisterEmployee(ctx fiber.Ctx) error {
 
 	return f.created(ctx, nil)
 }
+
+func (f *Fiber) GetEmployeeInfo(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	output, errCode := f.controller.GetEmployeeInfo(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, output)
+}
