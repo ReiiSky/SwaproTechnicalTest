@@ -27,6 +27,7 @@ func (loc Location) ID() objects.Identifier[int] {
 }
 
 func (loc *Location) ChangeName(employeeCode objects.InformationNumber[string], newName string) {
+	loc.name = newName
 	loc.changelog = loc.changelog.
 		UpdatedNow(objects.GetStringInformationNumber(employeeCode))
 }
