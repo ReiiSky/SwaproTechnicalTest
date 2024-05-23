@@ -17,6 +17,7 @@ type DepartmentParam struct {
 	ID   int
 	Name string
 	objects.ChangelogParam
+	PositionCount int
 }
 
 type PositionParam struct {
@@ -71,6 +72,8 @@ func NewEmployee(id int, param EmployeeParam) Employee {
 			departmentParam.ID,
 			departmentParam.Name,
 			departmentParam.ChangelogParam,
+			param.Position.EmployeeCount,
+			departmentParam.PositionCount,
 		)
 
 		p := entities.NewPosition(
@@ -147,6 +150,7 @@ func (employee *Employee) Register() {
 type RODepartment interface {
 	ID() objects.Identifier[int]
 	Name() string
+	Info() entities.DepartmentInfo
 	Changelog() objects.Changelog
 }
 
@@ -185,6 +189,8 @@ func (employee *Employee) AssignSuperior(super Superior, newPositionParam Positi
 		objects.GetNumberIdentifier(super.Department().ID()),
 		super.Department().Name(),
 		objects.ChangelogParam{}, // TODO: Not needed yet.
+		0,
+		0,
 	)
 	employee.department = &superDep
 	employee.addEvent(events.CreateOrUsePosition{
@@ -261,7 +267,7 @@ func (emp *Employee) ApplyPosition(posParam PositionParam, depParam DepartmentPa
 	newPos := entities.NewPosition(0, 0, posParam.Name, posParam.ChangelogParam, posParam.EmployeeCount)
 	emp.position = &newPos
 
-	newDep := entities.NewDepartment(0, depParam.Name, depParam.ChangelogParam)
+	newDep := entities.NewDepartment(0, depParam.Name, depParam.ChangelogParam, posParam.EmployeeCount, depParam.PositionCount)
 	emp.department = &newDep
 
 	emp.addEvent(events.CreateOrUsePosition{

@@ -8,14 +8,18 @@ import (
 
 type Department struct {
 	Entity[int]
-	name      string
-	changelog objects.Changelog
+	name          string
+	changelog     objects.Changelog
+	employeeCount int
+	positionCount int
 }
 
 func NewDepartment(
 	id int,
 	name string,
 	changelog objects.ChangelogParam,
+	employeeCount,
+	positionCount int,
 ) Department {
 	return Department{
 		Entity[int]{
@@ -23,6 +27,8 @@ func NewDepartment(
 		},
 		name,
 		objects.NewChangelog(changelog),
+		employeeCount,
+		positionCount,
 	}
 }
 
@@ -44,4 +50,24 @@ func (d Department) Changelog() objects.Changelog {
 
 func (d *Department) ChangeName(name string) {
 	d.name = name
+}
+
+type DepartmentInfo struct {
+	ID            int
+	Name          string
+	EmployeeCount int
+	PositionCount int
+	CreatedAt     objects.SwaproTime
+	UpdatedAt     *objects.SwaproTime
+}
+
+func (d Department) Info() DepartmentInfo {
+	return DepartmentInfo{
+		objects.GetNumberIdentifier(d.identifier),
+		d.name,
+		d.employeeCount,
+		d.positionCount,
+		d.changelog.CreatedAt(),
+		d.changelog.UpdatedAt(),
+	}
 }
