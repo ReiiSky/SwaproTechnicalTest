@@ -107,3 +107,17 @@ func (f *Fiber) DeleteEmployee(ctx fiber.Ctx) error {
 
 	return f.ok(ctx, nil)
 }
+
+func (f *Fiber) AssignSuperior(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.AssignSuperior(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
