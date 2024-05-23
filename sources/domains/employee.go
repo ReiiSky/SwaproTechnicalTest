@@ -291,3 +291,23 @@ func (emp *Employee) ChangePositionName(name string) error {
 
 	return nil
 }
+
+func (emp *Employee) DeletePosition() error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if !emp.InEmployement() {
+		return domainErr.NotAnEmployee{}
+	}
+
+	emp.ApplyPosition(PositionParam{}, DepartmentParam{})
+
+	// TODO: Resign all employee who use this position.
+	emp.addEvent(events.DeletePosition{
+		ID:        emp.position.ID(),
+		Changelog: emp.position.Changelog().UpdatedNow(emp.root.Code()),
+	})
+
+	return nil
+}
