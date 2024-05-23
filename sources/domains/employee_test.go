@@ -176,3 +176,52 @@ func TestAssignSupervisor(t *testing.T) {
 		t.Error("Aggregate inside employee after assign superior is not CreateOrUsePosition.")
 	}
 }
+
+func TestApplyPositionInDepartment(t *testing.T) {
+	// assume the employee is already exist
+	notEmployee := domains.NewEmployee(1, domains.EmployeeParam{
+		Code:     "22010011",
+		Name:     "employee eleven",
+		Password: "a51154c24773c46ab38520b1259bca98",
+		// the above employee wil be a supervisor of this employee.
+		ChangelogParam: newChangelogParam("22010011", false, false),
+	})
+
+	if notEmployee.InEmployement() {
+		t.Error("Employee expected not to be in employement")
+	}
+
+	var (
+		posParam = domains.PositionParam{Name: "Accountant"}
+		depParam = domains.DepartmentParam{Name: "Finance"}
+		err      error
+	)
+
+	// put empty string in pos param and dep param to make employee resign.
+	err = notEmployee.ApplyPosition(
+		posParam,
+		depParam,
+	)
+
+	if err != nil {
+		t.Errorf("Apply Position error is not a nill with message: %s", err.Error())
+	}
+
+	if notEmployee.Position().Name() != posParam.Name {
+		t.Errorf("Employee applied position name is not: %s", posParam.Name)
+	}
+
+	if notEmployee.Department().Name() != depParam.Name {
+		t.Errorf("Employee applied departement name is not: %s", depParam.Name)
+	}
+
+	empEvents := notEmployee.Events()
+
+	if len(empEvents) != 1 {
+		t.Error("Apply position supposed to have one domain event")
+	}
+
+	if _, ok := empEvents[0].Top().(events.CreateOrUsePosition); !ok {
+		t.Error("Aggregate inside employee after apply position is not CreateOrUsePosition.")
+	}
+}

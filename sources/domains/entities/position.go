@@ -24,3 +24,15 @@ func NewPosition(
 		objects.NewChangelog(changelog),
 	}
 }
+
+func (p Position) ID() objects.Identifier[int] {
+	return p.identifier
+}
+
+func (p Position) Name() string {
+	return p.name
+}
+
+func (p Position) Changelog() objects.Changelog {
+	return p.changelog
+}

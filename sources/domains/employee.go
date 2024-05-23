@@ -142,7 +142,13 @@ func (employee *Employee) Register() {
 	})
 }
 
-type ReadOnlyDepartment interface {
+type ROPosition interface {
+	ID() objects.Identifier[int]
+	Name() string
+	Changelog() objects.Changelog
+}
+
+type RODepartment interface {
 	ID() objects.Identifier[int]
 	Name() string
 	Changelog() objects.Changelog
@@ -150,7 +156,7 @@ type ReadOnlyDepartment interface {
 
 type Superior interface {
 	ID() objects.Identifier[int]
-	Department() ReadOnlyDepartment
+	Department() RODepartment
 }
 
 func (employee *Employee) AssignSuperior(super Superior, newPositionParam PositionParam) error {
@@ -187,6 +193,7 @@ func (employee *Employee) AssignSuperior(super Superior, newPositionParam Positi
 	employee.addEvent(events.CreateOrUsePosition{
 		DepartmentID: super.Department().ID(),
 		PositionName: newPositionParam.Name,
+		Changelog:    objects.NewCreateChangelog(employee.root.Code()),
 	})
 
 	return nil
@@ -196,8 +203,12 @@ func (emp Employee) ID() objects.Identifier[int] {
 	return emp.root.ID()
 }
 
-func (emp Employee) Department() ReadOnlyDepartment {
+func (emp Employee) Department() RODepartment {
 	return emp.department
+}
+
+func (emp Employee) Position() ROPosition {
+	return emp.position
 }
 
 func (emp *Employee) Delete() error {
@@ -215,5 +226,45 @@ func (emp *Employee) Delete() error {
 	})
 
 	emp.isDeleted = true
+	return nil
+}
+
+func (emp *Employee) ApplyPosition(posParam PositionParam, depParam DepartmentParam) error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if emp.InEmployement() {
+		return domainErr.AlreadEmployee{}
+	}
+
+	var (
+		posNameEmpty  = len(posParam.Name) <= 0
+		depParamEmpty = len(depParam.Name) <= 0
+	)
+
+	if posNameEmpty && depParamEmpty {
+		emp.addEvent(events.ResignEmployee{
+			ID:        emp.ID(),
+			Changelog: emp.root.Changelog().UpdatedNow(emp.root.Code()),
+		})
+
+		return nil
+	} else if posNameEmpty || depParamEmpty {
+		return domainErr.PositionOrDepartmentNotExist{}
+	}
+
+	newPos := entities.NewPosition(0, 0, posParam.Name, posParam.ChangelogParam)
+	emp.position = &newPos
+
+	newDep := entities.NewDepartment(0, depParam.Name, depParam.ChangelogParam)
+	emp.department = &newDep
+
+	emp.addEvent(events.CreateOrUsePosition{
+		DepartmentName: depParam.Name,
+		PositionName:   posParam.Name,
+		Changelog:      objects.NewCreateChangelog(emp.root.Code()),
+	})
+
 	return nil
 }
