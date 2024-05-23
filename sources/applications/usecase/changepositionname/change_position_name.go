@@ -1,4 +1,4 @@
-package applytoposition
+package changepositionname
 
 import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications"
