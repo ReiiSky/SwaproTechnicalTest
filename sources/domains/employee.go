@@ -540,7 +540,7 @@ func (emp *Employee) ChangeLocationNameByAttendance(
 			Changelog: att.Location().Changelog(),
 		})
 
-		break
+		return nil
 	}
 
 	return domainErr.AttendanceNotFound{}
