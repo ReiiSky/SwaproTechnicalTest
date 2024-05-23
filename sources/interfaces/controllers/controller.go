@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/deleteemployee"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getemployeeinfo"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/register"
 )
@@ -10,12 +11,14 @@ import (
 type Controller struct {
 	registerUsecase        register.Usecase
 	getemployeeInfoUsecase getemployeeinfo.Usecase
+	deleteemployeeUsecase  deleteemployee.Usecase
 }
 
 func NewController() Controller {
 	return Controller{
 		register.Usecase{},
 		getemployeeinfo.Usecase{},
+		deleteemployee.Usecase{},
 	}
 }
 
@@ -75,4 +78,33 @@ func (c Controller) GetEmployeeInfo(
 	}
 
 	return output, nil
+}
+
+func (c Controller) DeleteEmployee(
+	process applications.Process,
+	payload ControllerPayload,
+) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	errCode := c.deleteemployeeUsecase.Execute(process, authPayload)
+
+	if errCode != nil {
+		return errCode
+	}
+
+	return nil
 }
