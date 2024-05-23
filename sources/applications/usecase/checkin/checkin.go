@@ -5,6 +5,7 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/services/auth"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains"
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/entities"
 	domainErr "github.com/ReiiSky/SwaproTechnical/sources/domains/errors"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/specifications"
 )
@@ -13,7 +14,7 @@ type Usecase struct{}
 
 var errMaps = usecase.NewErrorMapper().
 	Add(usecase.ErrCodeNotFound, domainErr.EmployeeNotExist{}).
-	Add(usecase.ErrCodeInvalidRequest, domainErr.NotAnEmployee{}).
+	Add(usecase.ErrCodeInvalidRequest, domainErr.AttendanceStillActive{}).
 	Add(usecase.ErrCodeNotFound, domainErr.PositionOrDepartmentNotExist{})
 
 func (u Usecase) Execute(
@@ -35,7 +36,7 @@ func (u Usecase) Execute(
 		return errMaps.Map(domainErr.EmployeeNotExist{})
 	}
 
-	err := employee.ChangePositionName(input.LocationName)
+	err := employee.CheckIn(entities.LocationParam{Name: input.LocationName})
 
 	if err != nil {
 		return errMaps.Map(err)
