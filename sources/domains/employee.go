@@ -337,7 +337,7 @@ func (emp *Employee) DeletePosition() error {
 	// TODO: Resign all employee who use this position.
 	emp.addEvent(events.DeletePosition{
 		ID:        emp.position.ID(),
-		Changelog: emp.position.Changelog().UpdatedNow(emp.root.Code()),
+		Changelog: emp.position.Changelog().UpdatedNow(emp.root.Code()).DeletedNow(),
 	})
 
 	return nil
