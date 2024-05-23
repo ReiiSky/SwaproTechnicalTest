@@ -535,7 +535,7 @@ func (emp *Employee) ChangeLocationNameByAttendance(
 
 		att.ChangeLocationName(locParam.Name)
 		emp.addEvent(events.UpdateLocation{
-			ID:        att.ID(),
+			ID:        att.Location().ID(),
 			NewName:   locParam.Name,
 			Changelog: att.Location().Changelog(),
 		})

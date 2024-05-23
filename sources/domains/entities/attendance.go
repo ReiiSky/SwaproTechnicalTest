@@ -53,7 +53,7 @@ func (att Attendance) ID() objects.Identifier[int] {
 }
 
 type ROLocation interface {
-	ID() int
+	ID() objects.Identifier[int]
 	Name() string
 	Changelog() objects.Changelog
 }

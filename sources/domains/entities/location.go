@@ -22,8 +22,8 @@ func NewLocation(
 	}
 }
 
-func (loc Location) ID() int {
-	return objects.GetNumberIdentifier(loc.identifier)
+func (loc Location) ID() objects.Identifier[int] {
+	return loc.identifier
 }
 
 func (loc *Location) ChangeName(employeeCode objects.InformationNumber[string], newName string) {
