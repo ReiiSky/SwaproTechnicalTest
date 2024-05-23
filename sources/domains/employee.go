@@ -311,3 +311,26 @@ func (emp *Employee) DeletePosition() error {
 
 	return nil
 }
+
+func (emp *Employee) ChangeDepartementName(name string) error {
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if !emp.InEmployement() {
+		return domainErr.NotAnEmployee{}
+	}
+
+	if len(name) <= 0 {
+		return domainErr.PositionOrDepartmentNotExist{}
+	}
+
+	emp.department.ChangeName(name)
+	emp.addEvent(events.UpdateDepartment{
+		ID:        emp.position.ID(),
+		NewName:   name,
+		Changelog: emp.position.Changelog().UpdatedNow(emp.root.Code()),
+	})
+
+	return nil
+}

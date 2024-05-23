@@ -41,3 +41,7 @@ func (d Department) Name() string {
 func (d Department) Changelog() objects.Changelog {
 	return d.changelog
 }
+
+func (d *Department) ChangeName(name string) {
+	d.name = name
+}
