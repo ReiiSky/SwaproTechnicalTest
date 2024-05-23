@@ -35,7 +35,7 @@ func (u Usecase) Execute(
 	}
 
 	aggr = repositories.Employee().
-		GetOne(specifications.GetByID{})
+		GetOne(specifications.GetByID{ID: input.SuperiorID})
 
 	superior, ok := aggr.(*domains.Employee)
 
