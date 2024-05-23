@@ -6,6 +6,7 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains"
 	domainErr "github.com/ReiiSky/SwaproTechnical/sources/domains/errors"
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/specifications"
 )
 
@@ -20,7 +21,10 @@ func (u Usecase) Execute(
 ) (EmployeeInfoOutput, *usecase.ErrorWithCode) {
 	repositories := process.Repositories()
 	aggr := repositories.Employee().
-		GetOne(specifications.GetByID{ID: authPayload.EmployeeID})
+		GetOne(specifications.GetByID{
+			ID:              authPayload.EmployeeID,
+			AttendanceLimit: 20,
+		})
 
 	employee, ok := aggr.(*domains.Employee)
 
@@ -34,10 +38,29 @@ func (u Usecase) Execute(
 		return EmployeeInfoOutput{}, errMaps.Map(err)
 	}
 
+	attendances := employee.Attendances()
+	attendanceOutputs := []AttendanceOutput{}
+
+	for _, att := range attendances {
+		var out *string
+
+		if att.Out() != nil {
+			o := att.Out().ToISOUTC()
+			out = &o
+		}
+
+		attendanceOutputs = append(attendanceOutputs, AttendanceOutput{
+			ID:  objects.GetNumberIdentifier(att.ID()),
+			In:  att.In().ToISOUTC(),
+			Out: out,
+		})
+	}
+
 	return EmployeeInfoOutput{
 		Name:       info.Name,
 		Position:   info.PositionName,
 		Department: info.DepartementName,
+		Attendaces: attendanceOutputs,
 		CreatedAt:  info.CreatedAt.ToISOUTC(),
 	}, nil
 }

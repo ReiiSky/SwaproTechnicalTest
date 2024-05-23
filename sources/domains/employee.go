@@ -609,3 +609,13 @@ func (emp Employee) GetAttendanceByID(id int) ROAttendance {
 
 	return nil
 }
+
+func (emp Employee) Attendances() []ROAttendance {
+	atts := make([]ROAttendance, 0)
+
+	for _, att := range emp.attendances {
+		atts = append(atts, att)
+	}
+
+	return atts
+}
