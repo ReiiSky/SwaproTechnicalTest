@@ -8,7 +8,7 @@ func NewIdentifier[T string | int](value T) Identifier[T] {
 	return Identifier[T]{id: value}
 }
 
-func (i *Identifier[T]) Equal(other *Identifier[T]) bool {
+func (i Identifier[T]) Equal(other Identifier[T]) bool {
 	return i.id == other.id
 }
 

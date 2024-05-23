@@ -26,6 +26,15 @@ func (loc Location) ID() int {
 	return objects.GetNumberIdentifier(loc.identifier)
 }
 
+func (loc *Location) ChangeName(employeeCode objects.InformationNumber[string], newName string) {
+	loc.changelog = loc.changelog.
+		UpdatedNow(objects.GetStringInformationNumber(employeeCode))
+}
+
 func (loc Location) Name() string {
 	return loc.name
+}
+
+func (loc Location) Changelog() objects.Changelog {
+	return loc.changelog
 }

@@ -55,6 +55,11 @@ func (att Attendance) ID() objects.Identifier[int] {
 type ROLocation interface {
 	ID() int
 	Name() string
+	Changelog() objects.Changelog
+}
+
+func (att *Attendance) ChangeLocationName(newName string) {
+	att.location.ChangeName(att.employeeCode, newName)
 }
 
 func (att Attendance) Location() ROLocation {

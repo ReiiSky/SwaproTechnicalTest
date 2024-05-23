@@ -510,3 +510,38 @@ func (emp *Employee) DeleteAttendances() error {
 	emp.attendances = make([]entities.Attendance, 0)
 	return nil
 }
+
+func (emp *Employee) ChangeLocationNameByAttendance(
+	attendance ROAttendance,
+	locParam entities.LocationParam,
+) error {
+
+	if len(locParam.Name) <= 0 {
+		return domainErr.LocationNotExist{}
+	}
+
+	if emp.IsRegisterable() {
+		return domainErr.EmployeeNotExist{}
+	}
+
+	if len(emp.attendances) <= 0 {
+		return domainErr.AttendanceNotFound{}
+	}
+
+	for _, att := range emp.attendances {
+		if !att.ID().Equal(attendance.ID()) {
+			continue
+		}
+
+		att.ChangeLocationName(locParam.Name)
+		emp.addEvent(events.UpdateLocation{
+			ID:        att.ID(),
+			NewName:   locParam.Name,
+			Changelog: att.Location().Changelog(),
+		})
+
+		break
+	}
+
+	return domainErr.AttendanceNotFound{}
+}
