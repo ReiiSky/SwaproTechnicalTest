@@ -380,7 +380,7 @@ func (emp *Employee) DeleteDepartment() error {
 	// TODO: Resign all employee who use this department.
 	emp.addEvent(events.DeleteDepartment{
 		ID:        emp.department.ID(),
-		Changelog: emp.department.Changelog().UpdatedNow(emp.root.Code()),
+		Changelog: emp.department.Changelog().UpdatedNow(emp.root.Code()).DeletedNow(),
 	})
 
 	return nil
