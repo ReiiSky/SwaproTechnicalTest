@@ -29,11 +29,11 @@ type PositionParam struct {
 }
 
 type AttendanceParam struct {
-	ID         int
-	EmployeeID int
-	LocationID int
-	AbsentIn   time.Time
-	AbsentOut  *time.Time
+	ID        int
+	Location  entities.LocationParam
+	AbsentIn  time.Time
+	AbsentOut *time.Time
+	objects.ChangelogParam
 }
 
 type EmployeeParam struct {
@@ -104,8 +104,28 @@ func NewEmployee(id int, param EmployeeParam) Employee {
 		position:    position,
 		department:  department,
 		superiorID:  superiorID,
-		attendances: make([]entities.Attendance, 0),
+		attendances: convertAttendanceParams(param.Attendances),
 	}
+}
+
+func convertAttendanceParams(params []AttendanceParam) []entities.Attendance {
+	attendances := make([]entities.Attendance, len(params))
+
+	if len(params) <= 0 {
+		return attendances
+	}
+
+	for idx, param := range params {
+		attendances[idx] = entities.NewAttendance(
+			param.ID,
+			param.Location,
+			param.AbsentIn,
+			param.AbsentOut,
+			param.ChangelogParam,
+		)
+	}
+
+	return attendances
 }
 
 func (employee Employee) InEmployement() bool {
@@ -363,4 +383,53 @@ func (emp *Employee) DeleteDepartment() error {
 	})
 
 	return nil
+}
+
+type EmployeeInfo struct {
+	ID              int
+	Code            string
+	Name            string
+	PositionName    *string
+	DepartementName *string
+	CreatedAt       objects.SwaproTime
+}
+
+func (emp Employee) Info() (EmployeeInfo, error) {
+	info := EmployeeInfo{}
+
+	if emp.IsRegisterable() {
+		return info, domainErr.EmployeeNotExist{}
+	}
+
+	if emp.InEmployement() {
+		posName := emp.position.Name()
+		info.PositionName = &posName
+
+		depName := emp.department.Name()
+		info.DepartementName = &depName
+	}
+
+	info.ID = objects.GetNumberIdentifier(emp.root.ID())
+	info.Code = emp.root.Code()
+	info.Name = emp.root.Name()
+	info.CreatedAt = emp.root.Changelog().CreatedAt()
+
+	return info, nil
+}
+
+type ROAttendance interface {
+	ID() int
+	Location() entities.ROLocation
+	In() objects.SwaproTime
+	Out() *objects.SwaproTime
+	Changelog() objects.Changelog
+}
+
+func (emp Employee) LastCheckInInfo() ROAttendance {
+	attLength := len(emp.attendances)
+	if attLength <= 0 {
+		return nil
+	}
+
+	return emp.attendances[attLength-1]
 }

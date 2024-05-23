@@ -32,6 +32,10 @@ func (employee Employee) Code() string {
 	return objects.GetStringInformationNumber(employee.code)
 }
 
+func (employee Employee) Name() string {
+	return employee.name
+}
+
 func (emp Employee) Changelog() objects.Changelog {
 	return emp.changelog
 }

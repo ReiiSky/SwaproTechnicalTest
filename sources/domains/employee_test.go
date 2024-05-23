@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ReiiSky/SwaproTechnical/sources/domains"
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/entities"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/events"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
 )
@@ -63,7 +64,16 @@ var (
 				ChangelogParam: newChangelogParam(EmployeeCode, true, true),
 			},
 		},
-		Attendances: []domains.AttendanceParam{},
+		Attendances: []domains.AttendanceParam{
+			{
+				ID: 1,
+				Location: entities.LocationParam{
+					Name: "Building A",
+				},
+				AbsentIn:       time.Now(),
+				ChangelogParam: newChangelogParam(EmployeeCode, false, false),
+			},
+		},
 	})
 )
 
@@ -223,5 +233,11 @@ func TestApplyPositionInDepartment(t *testing.T) {
 
 	if _, ok := empEvents[0].Top().(events.CreateOrUsePosition); !ok {
 		t.Error("Aggregate inside employee after apply position is not CreateOrUsePosition.")
+	}
+}
+
+func TestEmployeeCheckIn(t *testing.T) {
+	if info := firstEmployee.LastCheckInInfo(); info == nil {
+		t.Error("Employee check in info is null, expected to be exist")
 	}
 }

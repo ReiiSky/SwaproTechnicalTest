@@ -21,3 +21,11 @@ func NewLocation(
 		objects.NewChangelog(changelog),
 	}
 }
+
+func (loc Location) ID() int {
+	return objects.GetNumberIdentifier(loc.identifier)
+}
+
+func (loc Location) Name() string {
+	return loc.name
+}
