@@ -574,3 +574,28 @@ func (emp *Employee) DeleteLocationByAttendance(
 
 	return domainErr.AttendanceNotFound{}
 }
+
+func (emp Employee) UniqueAttendanceLocation() []entities.ROLocation {
+	locations := make([]entities.ROLocation, 0)
+
+	for _, att := range emp.attendances {
+		indexOfLocation := -1
+
+		for idx, loc := range locations {
+			if loc.ID().Equal(att.Location().ID()) {
+				indexOfLocation = idx
+				break
+			}
+		}
+
+		if indexOfLocation >= 0 {
+			continue
+		}
+
+		locations = append(locations,
+			att.Location(),
+		)
+	}
+
+	return locations
+}
