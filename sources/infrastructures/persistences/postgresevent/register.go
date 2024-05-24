@@ -13,7 +13,7 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/infrastructures/persistences"
 )
 
-func leftPad(str string, targetLength int, padChar rune) string {
+func leftPad(str string, targetLength int) string {
 	return fmt.Sprintf("%0*s", targetLength, str)
 }
 
@@ -21,9 +21,9 @@ func newEmployeeCode() string {
 	now := time.Now().UTC()
 	year, month, day := now.Date()
 
-	y := leftPad(strconv.Itoa(year-2000), 2, '0')
-	m := leftPad(strconv.Itoa(int(month)), 2, '0')
-	d := leftPad(strconv.Itoa(int(day)), 2, '0')
+	y := leftPad(strconv.Itoa(year-2000), 2)
+	m := leftPad(strconv.Itoa(int(month)), 2)
+	d := leftPad(strconv.Itoa(int(day)), 2)
 	ms := strconv.Itoa(int(now.Nanosecond()))
 
 	return y + m + d + ms
