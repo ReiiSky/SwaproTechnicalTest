@@ -36,7 +36,7 @@ func (u Usecase) Execute(
 	employee := repositories.Employee().
 		GetOne(specifications.GetEmpty{
 			Name:     input.Name,
-			Password: input.Password,
+			Password: process.Services().Hasher().Hash(input.Password),
 		}).(*domains.Employee)
 
 	employee.Register()
