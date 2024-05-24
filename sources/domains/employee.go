@@ -616,3 +616,7 @@ func (emp Employee) Attendances() []ROAttendance {
 
 	return atts
 }
+
+func (emp Employee) SignInable(otherPassword string) bool {
+	return emp.root.Password().Raw() == otherPassword
+}
