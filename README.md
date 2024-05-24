@@ -32,3 +32,12 @@
 ## Skema Database
 
 ![Database Schema](public/schema.png)
+
+## Catatan
+
+Table `employee` tidak perlu ada `department id`. Karena sudah memiliki `position id`, yang dimana table `position` sudah memiliki `department id`. Jika tetap ada, ada kemungkinan data terduplikasi. Sebagai contoh:
+
+- Employee dengan id 1 memiliki department dengan id 3 dan position id 5
+- Sedangkan position id 5 memiliki department id 9
+
+Lalu pertanyaannya, employee bekerja di department id 3 atau 9?
