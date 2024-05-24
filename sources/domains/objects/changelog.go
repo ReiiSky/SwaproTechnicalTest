@@ -75,10 +75,30 @@ func (c Changelog) CreatedAt() SwaproTime {
 	return c.createdAt
 }
 
+func (c Changelog) CreatedBy() string {
+	return c.createdBy
+}
+
 func (c Changelog) UpdatedAt() *SwaproTime {
 	if c.update == nil {
 		return nil
 	}
 
 	return &c.update.at
+}
+
+func (c Changelog) UpdatedBy() *string {
+	if c.update == nil {
+		return nil
+	}
+
+	return &c.update.by
+}
+
+func (c Changelog) DeletedAt() *SwaproTime {
+	if c.deletedAt == nil {
+		return nil
+	}
+
+	return c.deletedAt
 }
