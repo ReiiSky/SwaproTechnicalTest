@@ -77,7 +77,7 @@ func (s Service) Auth() services.Auth {
 	return s.auth
 }
 
-func (s Service) Hash() services.Hasher {
+func (s Service) Hasher() services.Hasher {
 	return s.hasher
 }
 

@@ -19,7 +19,7 @@ func NewJWTAuthentication(token string) JWTAuthentication {
 	return JWTAuthentication{[]byte(token)}
 }
 
-func (auth *JWTAuthentication) Encode(payload AuthPayload) string {
+func (auth JWTAuthentication) Encode(payload AuthPayload) string {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"employee_id": payload.EmployeeID,
 	})
@@ -28,7 +28,7 @@ func (auth *JWTAuthentication) Encode(payload AuthPayload) string {
 	return encodedToken
 }
 
-func (auth *JWTAuthentication) Decode(encoded string) (AuthPayload, error) {
+func (auth JWTAuthentication) Decode(encoded string) (AuthPayload, error) {
 	payload := AuthPayload{}
 	parsedClaim, err := jwt.ParseWithClaims(encoded, &jwt.MapClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return auth.token, nil

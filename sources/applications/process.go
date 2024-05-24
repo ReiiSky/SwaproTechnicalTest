@@ -11,7 +11,7 @@ type Process interface {
 
 type Services interface {
 	Auth() services.Auth
-	Hash() services.Hasher
+	Hasher() services.Hasher
 }
 
 type Repositories interface {
