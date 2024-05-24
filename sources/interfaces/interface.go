@@ -1,6 +1,8 @@
 package interfaces
 
-import "github.com/ReiiSky/SwaproTechnical/sources/applications"
+import (
+	"github.com/ReiiSky/SwaproTechnical/sources/applications"
+)
 
 type StopableProcess interface {
 	applications.Process
