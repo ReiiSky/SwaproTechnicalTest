@@ -1,6 +1,8 @@
 package usecase
 
-import "errors"
+import (
+	"errors"
+)
 
 const (
 	ErrCodeUnkown = iota
@@ -31,7 +33,7 @@ func (mapper *ErrorMapper) Add(errCode int, err error) *ErrorMapper {
 
 func (mapper ErrorMapper) Map(err error) *ErrorWithCode {
 	for _, mappedError := range mapper.errors {
-		if errors.As(err, mappedError.ErrInstance) {
+		if errors.Is(err, mappedError.ErrInstance) {
 			return &mappedError
 		}
 	}
