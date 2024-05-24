@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
 	"github.com/ReiiSky/SwaproTechnical/sources/interfaces"
@@ -28,10 +29,25 @@ func (f Fiber) Run() {
 }
 
 func (f *Fiber) registerRoute() *Fiber {
+	f.Post("/signin", f.SignIn)
 	f.Post("/employee", f.RegisterEmployee)
 	f.Get("/employee", f.GetEmployeeInfo)
 
 	return f
+}
+
+func parseBearer(auth string) *string {
+	if strings.Index(auth, "Bearer") != 0 {
+		return nil
+	}
+
+	auths := strings.Split(auth, " ")
+
+	if len(auths) != 2 {
+		return nil
+	}
+
+	return &auths[1]
 }
 
 func (f Fiber) parse(ctx fiber.Ctx) controllers.ControllerPayload {
@@ -40,7 +56,7 @@ func (f Fiber) parse(ctx fiber.Ctx) controllers.ControllerPayload {
 	queries := ctx.Queries()
 
 	if authorization := headers["Authorization"]; len(authorization) > 0 {
-		payload.Authtoken = &authorization[0]
+		payload.Authtoken = parseBearer(authorization[0])
 	}
 
 	payload.Query = queries
@@ -79,6 +95,20 @@ func (f Fiber) apply(ctx fiber.Ctx, errCode usecase.ErrorWithCode) error {
 
 	return ctx.Status(http.StatusInternalServerError).
 		JSON(interfaces.NewFailedResponse(nil, errors.New("internal server error")))
+}
+
+func (f *Fiber) SignIn(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	output, errCode := f.controller.Login(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.created(ctx, output)
 }
 
 func (f *Fiber) RegisterEmployee(ctx fiber.Ctx) error {

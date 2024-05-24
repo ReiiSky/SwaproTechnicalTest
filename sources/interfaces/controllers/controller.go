@@ -19,11 +19,13 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getemployeeinfo"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getlocationattendances"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/getpositioninformation"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/login"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/register"
 )
 
 type Controller struct {
 	registerUsecase               register.Usecase
+	loginUsecase                  login.Usecase
 	getemployeeInfoUsecase        getemployeeinfo.Usecase
 	deleteemployeeUsecase         deleteemployee.Usecase
 	assignsuperior                assignsupervisor.Usecase
@@ -45,6 +47,7 @@ type Controller struct {
 func NewController() Controller {
 	return Controller{
 		register.Usecase{},
+		login.Usecase{},
 		getemployeeinfo.Usecase{},
 		deleteemployee.Usecase{},
 		assignsupervisor.Usecase{},
@@ -68,6 +71,26 @@ type ControllerPayload struct {
 	Authtoken  *string
 	Query      map[string]string
 	BodyString *string
+}
+
+func (c Controller) Login(process applications.Process, payload ControllerPayload) (login.LoginOutput, *usecase.ErrorWithCode) {
+	if payload.BodyString == nil {
+		return login.LoginOutput{}, &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: nil,
+		}
+	}
+
+	input, err := login.NewEmployeeLoginInput(*payload.BodyString)
+
+	if err != nil {
+		return login.LoginOutput{}, &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	return c.loginUsecase.Execute(process, input)
 }
 
 func (c Controller) RegisterEmployee(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
