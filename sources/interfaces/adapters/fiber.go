@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
@@ -11,12 +12,26 @@ import (
 )
 
 type Fiber struct {
+	fiber.App
+	port       int
 	kernel     interfaces.IKernel
 	controller controllers.Controller
 }
 
-func NewFiber(kernel interfaces.IKernel) Fiber {
-	return Fiber{kernel, controllers.NewController()}
+func NewFiber(kernel interfaces.IKernel, port int) Fiber {
+	return Fiber{*fiber.New(), port, kernel, controllers.NewController()}
+}
+
+func (f Fiber) Run() {
+	f.registerRoute().
+		Listen(fmt.Sprintf(":%d", f.port))
+}
+
+func (f *Fiber) registerRoute() *Fiber {
+	f.Post("/employee", f.RegisterEmployee)
+	f.Get("/employee", f.GetEmployeeInfo)
+
+	return f
 }
 
 func (f Fiber) parse(ctx fiber.Ctx) controllers.ControllerPayload {
