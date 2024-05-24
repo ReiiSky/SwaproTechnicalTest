@@ -9,6 +9,7 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/domains"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/specifications"
 	"github.com/ReiiSky/SwaproTechnical/sources/infrastructures/persistences"
+	"github.com/ReiiSky/SwaproTechnical/sources/infrastructures/persistences/model"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -21,7 +22,7 @@ func (impl GetByEmployeeID) Fn() persistences.SpecImplFn {
 
 		rows := []employeeRow{}
 		result, _ := sq.
-			Select(employeeColumns...).
+			Select(model.EmployeeColumns...).
 			From("employee").
 			Where(sq.Eq{"employee_id": fnSpec.ID}).
 			PlaceholderFormat(sq.Dollar).

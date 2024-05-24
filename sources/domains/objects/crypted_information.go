@@ -11,3 +11,7 @@ func NewMD5CryptedInformation(information string) CryptedInformation {
 		method:   "md5",
 	}
 }
+
+func (ci CryptedInformation) Raw() string {
+	return ci.password
+}

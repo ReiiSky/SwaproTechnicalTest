@@ -1,6 +1,8 @@
 package entities
 
-import "github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
+import (
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
+)
 
 type Employee struct {
 	Entity[int]
@@ -34,6 +36,10 @@ func (employee Employee) Code() string {
 
 func (employee Employee) Name() string {
 	return employee.name
+}
+
+func (emp Employee) Password() objects.CryptedInformation {
+	return emp.password
 }
 
 func (emp Employee) Changelog() objects.Changelog {

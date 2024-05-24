@@ -161,10 +161,7 @@ func (employee *Employee) Register() {
 
 	employee.isRegistered = true
 	employee.addEvent(events.CreateEmployee{
-		Employee:   employee.root,
-		Position:   employee.position,
-		Department: employee.department,
-		SuperiorID: employee.superiorID,
+		Employee: employee.root,
 	})
 }
 

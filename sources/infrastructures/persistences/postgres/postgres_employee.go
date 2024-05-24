@@ -10,13 +10,8 @@ import (
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/entities"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/specifications"
+	"github.com/ReiiSky/SwaproTechnical/sources/infrastructures/persistences/model"
 	"github.com/jmoiron/sqlx"
-)
-
-var (
-	employeeColumns   = []string{"employee_id", "employee_code", "position_id", "superior_id", "name", "password"}
-	positionColumns   = []string{"position_id", "department_id", "name"}
-	departmentColumns = []string{"department_id", "department_name"}
 )
 
 type attendanceRow struct {
@@ -142,7 +137,7 @@ func getEmployeeDetail(ctx context.Context, db *sql.DB, employeeData employeeRow
 	if employeeData.PositionID != nil {
 		rows := []positionRow{}
 		result, _ := sq.
-			Select(positionColumns...).
+			Select(model.PositionColumns...).
 			From("position").
 			Where(sq.Eq{"position_id": *employeeData.PositionID}).
 			PlaceholderFormat(sq.Dollar).
@@ -155,7 +150,7 @@ func getEmployeeDetail(ctx context.Context, db *sql.DB, employeeData employeeRow
 			pos := rows[0]
 			depRows := []departmentRow{}
 			result, _ := sq.
-				Select(departmentColumns...).
+				Select(model.DepartmentColumns...).
 				From("department").
 				Where(sq.Eq{"department_id": pos.DepartmentID}).
 				PlaceholderFormat(sq.Dollar).
