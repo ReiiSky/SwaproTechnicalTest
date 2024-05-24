@@ -33,6 +33,23 @@ func (f *Fiber) registerRoute() *Fiber {
 	f.Post("/employee", f.RegisterEmployee)
 	f.Get("/employee", f.GetEmployeeInfo)
 
+	// TODO: Event not implemented yet.
+	f.Delete("/employee", f.DeleteEmployee)
+	f.Put("/employee/superior", f.AssignSuperior)
+	f.Get("/position", f.GetPositionInformation)
+	f.Post("/position", f.ApplyPosition)
+	f.Put("/position", f.ChangePositionName)
+	f.Delete("/position", f.DeletePosition)
+	f.Get("/department", f.GetDepartmentInformation)
+	f.Put("/department", f.ChangeDepartmentName)
+	f.Delete("/department", f.DeleteDepartment)
+	f.Post("/checkin", f.CheckIn)
+	f.Put("/checkout", f.CheckOut)
+	f.Delete("/attendance", f.DeleteAttendance)
+	f.Get("/attendance/location", f.GetLocationAttendance)
+	f.Put("/attendance/location", f.ChangeLocationName)
+	f.Delete("/location", f.DeleteLocation)
+
 	return f
 }
 
