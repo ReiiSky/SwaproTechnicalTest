@@ -10,6 +10,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains"
 	"github.com/ReiiSky/SwaproTechnical/sources/domains/events"
+	"github.com/ReiiSky/SwaproTechnical/sources/domains/objects"
 	"github.com/ReiiSky/SwaproTechnical/sources/infrastructures/persistences"
 )
 
@@ -51,6 +52,8 @@ func (impl RegisterImpl) Fn() persistences.EventImplFn {
 			PlaceholderFormat(sq.Dollar).
 			RunWith(tx).
 			ScanContext(ctx, &newEmployeeID)
+
+		upsertChangelog(ctx, tx, "employee", newEmployeeID, objects.NewCreateChangelog(employeeCode))
 
 		return err
 	}
