@@ -32,6 +32,7 @@ func (f *Fiber) registerRoute() *Fiber {
 	f.Post("/signin", f.SignIn)
 	f.Post("/employee", f.RegisterEmployee)
 	f.Get("/employee", f.GetEmployeeInfo)
+	f.Post("/membership", f.AddMembership)
 
 	// TODO: Event not implemented yet.
 	f.Delete("/employee", f.DeleteEmployee)
@@ -358,6 +359,20 @@ func (f *Fiber) DeleteLocation(ctx fiber.Ctx) error {
 
 	requestPayload := f.parse(ctx)
 	errCode := f.controller.DeleteLocation(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) AddMembership(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	errCode := f.controller.AddMembership(process, requestPayload)
 
 	if errCode != nil {
 		return f.apply(ctx, *errCode)

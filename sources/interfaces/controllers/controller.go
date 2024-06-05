@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/ReiiSky/SwaproTechnical/sources/applications"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase"
+	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/addmembership"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/applytoposition"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/assignsupervisor"
 	"github.com/ReiiSky/SwaproTechnical/sources/applications/usecase/changedepartmentname"
@@ -42,6 +43,7 @@ type Controller struct {
 	getlocationattendances        getlocationattendances.Usecase
 	changelocationname            changelocationname.Usecase
 	deletelocationUsecase         deletelocation.Usecase
+	addmembershipUsecase          addmembership.Usecase
 }
 
 func NewController() Controller {
@@ -64,6 +66,7 @@ func NewController() Controller {
 		getlocationattendances.Usecase{},
 		changelocationname.Usecase{},
 		deletelocation.Usecase{},
+		addmembership.Usecase{},
 	}
 }
 
@@ -526,4 +529,33 @@ func (c Controller) DeleteLocation(process applications.Process, payload Control
 	}
 
 	return c.deletelocationUsecase.Execute(process, authPayload, input)
+}
+
+func (c Controller) AddMembership(process applications.Process, payload ControllerPayload) *usecase.ErrorWithCode {
+	if payload.Authtoken == nil {
+		return &usecase.ErrorWithCode{
+			ErrCode: usecase.ErrCodeUnauthorized,
+		}
+	}
+
+	authPayload, err := process.Services().
+		Auth().Decode(*payload.Authtoken)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeUnauthorized,
+			ErrInstance: err,
+		}
+	}
+
+	input, err := addmembership.NewAddMembershipInput(*payload.BodyString)
+
+	if err != nil {
+		return &usecase.ErrorWithCode{
+			ErrCode:     usecase.ErrCodeInvalidRequest,
+			ErrInstance: err,
+		}
+	}
+
+	return c.addmembershipUsecase.Execute(process, authPayload, input)
 }

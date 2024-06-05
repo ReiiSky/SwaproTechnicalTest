@@ -19,7 +19,8 @@ func FiberAPI(env environments.EnvVarContainer) adapters.Fiber {
 		AddSpecImpl(postgres.GetByEmployeeID{}).
 		AddSpecImpl(postgres.GetByEmpty{}).
 		AddSpecImpl(postgres.GetByEmployeeName{}).
-		AddEventImpl(postgresevent.RegisterImpl{})
+		AddEventImpl(postgresevent.RegisterImpl{}).
+		AddEventImpl(postgresevent.AddMembershipImpl{})
 
 	kernelParam := infrastructures.KernelParam{
 		ContextDuration: time.Second * time.Duration(env.GetInt("PROCESS_TIMEOUT_IN_SECOND")),
