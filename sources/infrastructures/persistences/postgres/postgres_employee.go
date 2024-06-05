@@ -14,6 +14,14 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type membershipRow struct {
+	EmployeeID   int    `db:"employee_id"`
+	MembershipID int    `db:"membership_id"`
+	Name         string `db:"name"`
+	Address      string `db:"address"`
+	IsActive     bool   `db:"is_active"`
+}
+
 type attendanceRow struct {
 	AttendanceID int     `db:"attendance_id"`
 	EmployeeID   int     `db:"employee_id"`
@@ -85,7 +93,7 @@ func convertChangelogRowToParam(c changelog) objects.ChangelogParam {
 	}
 }
 
-func getEmployeeDetail(ctx context.Context, db *sql.DB, employeeData employeeRow, attendanceLimit int) domains.Employee {
+func getEmployeeDetail(ctx context.Context, db *sql.DB, employeeData employeeRow, attendanceLimit int, withMembership bool) domains.Employee {
 	var (
 		positionParam   *domains.PositionParam
 		changelogParam  objects.ChangelogParam
@@ -176,6 +184,35 @@ func getEmployeeDetail(ctx context.Context, db *sql.DB, employeeData employeeRow
 		}
 	}
 
+	var mems entities.Membership
+
+	if withMembership {
+		rows := make([]membershipRow, 0)
+		result, _ := sq.
+			Select(model.MembershipColumns...).
+			From("membership").
+			Where(sq.Eq{"employee_id": employeeData.ID}).
+			Where(sq.Eq{"is_active": true}).
+			Limit(1).
+			PlaceholderFormat(sq.Dollar).
+			RunWith(db).
+			QueryContext(ctx)
+
+		sqlx.StructScan(result, &rows)
+
+		for _, row := range rows {
+			mems = entities.NewMembership(
+				row.MembershipID,
+				row.Name, "",
+				row.Address,
+				row.IsActive,
+				convertChangelogRowToParam(*getChangelog(ctx, db, "membership", row.MembershipID)),
+			)
+
+			break
+		}
+	}
+
 	return domains.NewEmployee(employeeData.ID, domains.EmployeeParam{
 		Code:           employeeData.Code,
 		Name:           employeeData.Name,
@@ -184,5 +221,6 @@ func getEmployeeDetail(ctx context.Context, db *sql.DB, employeeData employeeRow
 		SuperiorID:     employeeData.SuperiorID,
 		ChangelogParam: changelogParam,
 		Attendances:    attendanceParam,
+		Membership:     mems,
 	})
 }

@@ -33,6 +33,7 @@ func (f *Fiber) registerRoute() *Fiber {
 	f.Post("/employee", f.RegisterEmployee)
 	f.Get("/employee", f.GetEmployeeInfo)
 	f.Post("/membership", f.AddMembership)
+	f.Get("/membership", f.GetMembership)
 
 	// TODO: Event not implemented yet.
 	f.Delete("/employee", f.DeleteEmployee)
@@ -379,4 +380,18 @@ func (f *Fiber) AddMembership(ctx fiber.Ctx) error {
 	}
 
 	return f.ok(ctx, nil)
+}
+
+func (f *Fiber) GetMembership(ctx fiber.Ctx) error {
+	process := f.kernel.NewProcess()
+	defer process.Close()
+
+	requestPayload := f.parse(ctx)
+	output, errCode := f.controller.GetMembership(process, requestPayload)
+
+	if errCode != nil {
+		return f.apply(ctx, *errCode)
+	}
+
+	return f.ok(ctx, output)
 }

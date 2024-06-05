@@ -39,7 +39,7 @@ func (impl GetByEmployeeName) Fn() persistences.SpecImplFn {
 			return []applications.Aggregate{}
 		}
 
-		employee := getEmployeeDetail(ctx, db, rows[0], fnSpec.AttendanceLimit)
+		employee := getEmployeeDetail(ctx, db, rows[0], fnSpec.AttendanceLimit, false)
 		return []applications.Aggregate{&employee}
 	}
 }

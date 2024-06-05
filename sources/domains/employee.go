@@ -43,6 +43,7 @@ type EmployeeParam struct {
 	Name        string
 	Password    string
 	Attendances []AttendanceParam
+	Membership  entities.Membership
 	objects.ChangelogParam
 }
 
@@ -53,7 +54,7 @@ type Employee struct {
 	department  *entities.Department
 	superiorID  *objects.Identifier[int]
 	attendances []entities.Attendance
-	memberships []entities.Membership
+	membership  entities.Membership
 
 	// internal state
 	isRegistered bool
@@ -106,7 +107,7 @@ func NewEmployee(id int, param EmployeeParam) Employee {
 		department:  department,
 		superiorID:  superiorID,
 		attendances: convertAttendanceParams(param.Code, param.Attendances),
-		memberships: make([]entities.Membership, 0),
+		membership:  param.Membership,
 	}
 }
 
@@ -619,14 +620,24 @@ func (emp Employee) Attendances() []ROAttendance {
 	return atts
 }
 
+type ROMembership interface {
+	Name() string
+	Address() string
+	IsActive() bool
+	Changelog() objects.Changelog
+}
+
+func (emp Employee) Membership() ROMembership {
+	return emp.membership
+}
+
 func (emp *Employee) AddMembership(name, address string) error {
 	currentMembership := entities.NewMembership(
 		0, name, emp.root.Password().Raw(), address,
 		true, objects.ChangelogParam{},
 	)
 
-	emp.memberships = append(emp.memberships, currentMembership)
-
+	emp.membership = currentMembership
 	emp.addEvent(events.AddMembership{
 		Name:       name,
 		Password:   currentMembership.Password(),

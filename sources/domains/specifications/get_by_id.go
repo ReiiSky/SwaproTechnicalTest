@@ -3,6 +3,7 @@ package specifications
 type GetByID struct {
 	ID int
 
+	WithMembership  bool
 	AttendanceLimit int
 }
 

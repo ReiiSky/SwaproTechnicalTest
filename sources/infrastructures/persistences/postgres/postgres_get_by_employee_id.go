@@ -35,7 +35,7 @@ func (impl GetByEmployeeID) Fn() persistences.SpecImplFn {
 			return []applications.Aggregate{}
 		}
 
-		employee := getEmployeeDetail(ctx, db, rows[0], fnSpec.AttendanceLimit)
+		employee := getEmployeeDetail(ctx, db, rows[0], fnSpec.AttendanceLimit, fnSpec.WithMembership)
 		return []applications.Aggregate{&employee}
 	}
 }

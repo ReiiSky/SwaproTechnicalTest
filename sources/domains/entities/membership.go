@@ -35,6 +35,18 @@ func (mem Membership) ID() objects.Identifier[int] {
 	return mem.identifier
 }
 
+func (mem Membership) Name() string {
+	return mem.name
+}
+
+func (mem Membership) Address() string {
+	return mem.address
+}
+
+func (mem Membership) IsActive() bool {
+	return mem.isActive
+}
+
 func (mem Membership) Password() objects.CryptedInformation {
 	return mem.password
 }
