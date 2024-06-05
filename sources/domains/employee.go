@@ -619,9 +619,9 @@ func (emp Employee) Attendances() []ROAttendance {
 	return atts
 }
 
-func (emp *Employee) AddMembership(name, hashedPassword, address string) error {
+func (emp *Employee) AddMembership(name, address string) error {
 	currentMembership := entities.NewMembership(
-		0, name, hashedPassword, address,
+		0, name, emp.root.Password().Raw(), address,
 		true, objects.ChangelogParam{},
 	)
 

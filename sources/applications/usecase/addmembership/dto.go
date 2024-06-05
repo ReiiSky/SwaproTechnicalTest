@@ -8,9 +8,8 @@ import (
 )
 
 type AddMembershipInput struct {
-	Name     string `json:"name" validate:"required,alphaSpace,minlength=4,maxlength=64"`
-	Password string `json:"password" validate:"required,minlength=4,maxlength=64"`
-	Address  string `json:"address" validate:"required,minlength=4,maxlength=64"`
+	Name    string `json:"name" validate:"required,alphaSpace,minlength=4,maxlength=64"`
+	Address string `json:"address" validate:"required,minlength=4,maxlength=64"`
 }
 
 var validatorInstance = validator.New()

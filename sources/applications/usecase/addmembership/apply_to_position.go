@@ -35,8 +35,7 @@ func (u Usecase) Execute(
 		return errMaps.Map(domainErr.EmployeeNotExist{})
 	}
 
-	hashedPasword := process.Services().Hasher().Hash(input.Password)
-	err := employee.AddMembership(input.Name, hashedPasword, input.Address)
+	err := employee.AddMembership(input.Name, input.Address)
 
 	if err != nil {
 		return errMaps.Map(err)
